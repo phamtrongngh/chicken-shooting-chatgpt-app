@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Chicken Invaders - Web Version</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+        <canvas id="canvas"></canvas>
+        
+    <script>
+        // Load the game when page is ready
+        window.addEventListener('load', async function() {
+            console.log('Loading Open Chicken Invaders...');
+            
+            try {
+                // Module configuration for Emscripten
+                const moduleConfig = {
+                    canvas: document.getElementById('canvas'),
+                    
+                    // Status updates
+                    setStatus: function(text) {
+                        if (text) {
+                            console.log('[Status]', text);
+                        }
+                    },
+                    
+                    // Console output
+                    print: function(text) {
+                        console.log('[Game]', text);
+                    },
+                    
+                    printErr: function(text) {
+                        console.error('[Game Error]', text);
+                    },
+                    
+                    // Loading progress
+                    monitorRunDependencies: function(left) {
+                        if (left > 0) {
+                            console.log('Loading game files... (' + left + ' remaining)');
+                        } else {
+                            console.log('Initializing game...');
+                        }
+                    },
+                    
+                    // Handle runtime events
+                    onRuntimeInitialized: function() {
+                        console.log('Game runtime initialized successfully!');
+                    },
+                    
+                    onAbort: function(what) {
+                        console.error('Game aborted:', what);
+                    }
+                };
+
+                // Initialize the game module
+                console.log('Creating game module...');
+                const gameModule = await createModule(moduleConfig);
+                console.log('Game module created successfully!');
+                
+                // Start the game
+                console.log('Starting game...');
+                gameModule.callMain();
+                console.log('Game started!');
+                
+            } catch (error) {
+                console.error('Failed to load game:', error);
+            }
+        });
+    </script>
+    
+    <!-- Load the compiled game -->
+    <script src="oci.js"></script>
+</body>
+</html>
